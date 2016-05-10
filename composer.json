@@ -1,5 +1,6 @@
 {
     "require": {
-        "cmfcmf/openweathermap-php-api": "~2.0"
+        "cmfcmf/openweathermap-php-api": "~2.0",
+        "ip2location/ip2location-php": "7.*"
     }
 }

@@ -50,11 +50,11 @@ class WeatherForecast implements \Iterator
     public $lastUpdate;
 
     /**
-     * An array of {@link WeatherForecast} objects.
+     * An array of {@link Forecast} objects.
      *
-     * @var array
+     * @var Forecast[]
      *
-     * @see WeatherForecast The WeatherForecast class.
+     * @see Forecast The Forecast class.
      */
     private $forecasts;
 
@@ -74,21 +74,31 @@ class WeatherForecast implements \Iterator
      */
     public function __construct($xml, $units, $days)
     {
-        $this->city = new City(-1, $xml->location->name, $xml->location->location['longitude'], $xml->location->location['latitude'], $xml->location->country);
-        $this->sun = new Sun(new \DateTime($xml->sun['rise']), new \DateTime($xml->sun['set']));
+        $this->city = new City($xml->location->location['geobaseid'], $xml->location->name, $xml->location->location['longitude'], $xml->location->location['latitude'], $xml->location->country);
+        $utctz = new \DateTimeZone('UTC');
+        $this->sun = new Sun(new \DateTime($xml->sun['rise'], $utctz), new \DateTime($xml->sun['set'], $utctz));
         $this->lastUpdate = new \DateTime($xml->meta->lastupdate);
 
+        $today = new \DateTime();
+        $today->setTime(0, 0, 0);
         $counter = 0;
         foreach ($xml->forecast->time as $time) {
+            $date = new \DateTime(isset($time['day']) ? $time['day'] : $time['to']);
+            if ($date < $today) {
+                // Sometimes OpenWeatherMap returns results which aren't real
+                // forecasts. The best we can do is to ignore them.
+                continue;
+            }
             $forecast = new Forecast($time, $units);
             $forecast->city = $this->city;
+            $forecast->sun = $this->sun;
             $this->forecasts[] = $forecast;
 
             $counter++;
             // Make sure to only return the requested number of days.
             if ($days <= 5 && $counter == $days * 8) {
                 break;
-            } else if ($days > 5 && $counter == $days) {
+            } elseif ($days > 5 && $counter == $days) {
                 break;
             }
         }

@@ -1,35 +1,33 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "53326842534ba63824d40de64fabf6ac",
+    "hash": "0713f5ccaa0436a075cdada01dd7ca43",
+    "content-hash": "12077064babe08362d9a48b8ecb3111e",
     "packages": [
         {
             "name": "cmfcmf/openweathermap-php-api",
-            "version": "v2.0.8",
+            "version": "v2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cmfcmf/OpenWeatherMap-PHP-Api.git",
-                "reference": "b51dbbff4cd1aa2a0c4f20716d99d8eadb94c58b"
+                "reference": "96e95ef08e372992d5199b7da496bd196cca3ec5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cmfcmf/OpenWeatherMap-PHP-Api/zipball/b51dbbff4cd1aa2a0c4f20716d99d8eadb94c58b",
-                "reference": "b51dbbff4cd1aa2a0c4f20716d99d8eadb94c58b",
+                "url": "https://api.github.com/repos/cmfcmf/OpenWeatherMap-PHP-Api/zipball/96e95ef08e372992d5199b7da496bd196cca3ec5",
+                "reference": "96e95ef08e372992d5199b7da496bd196cca3ec5",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.0"
             },
-            "require-dev": {
-                "phpunit/phpunit": "^4.7.0"
-            },
             "type": "library",
             "autoload": {
-                "psr-0": {
-                    "Cmfcmf\\": ""
+                "psr-4": {
+                    "Cmfcmf\\": "Cmfcmf"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -51,7 +49,47 @@
                 "weather",
                 "weather api"
             ],
-            "time": "2015-07-14 09:57:42"
+            "time": "2016-04-17 14:21:08"
+        },
+        {
+            "name": "ip2location/ip2location-php",
+            "version": "7.2.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/chrislim2888/IP2Location-PHP-Module.git",
+                "reference": "623787bc81e10aa50f510d5aefad9cd725695bf6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/chrislim2888/IP2Location-PHP-Module/zipball/623787bc81e10aa50f510d5aefad9cd725695bf6",
+                "reference": "623787bc81e10aa50f510d5aefad9cd725695bf6",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "IP2Location.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPLv3"
+            ],
+            "authors": [
+                {
+                    "name": "IP2Location",
+                    "email": "support@ip2location.com",
+                    "homepage": "http://www.ip2location.com"
+                }
+            ],
+            "description": "[Official Release] IP2Location PHP API to get location info from IPv4 and IPv6 address.",
+            "homepage": "http://www.ip2location.com",
+            "keywords": [
+                "geolocation",
+                "ip2location",
+                "ip2locationlite"
+            ],
+            "time": "2016-01-07 01:12:07"
         }
     ],
     "packages-dev": [],

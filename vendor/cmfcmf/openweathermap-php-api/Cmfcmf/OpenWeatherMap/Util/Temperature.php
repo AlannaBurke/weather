@@ -38,6 +38,26 @@ class Temperature
     public $max;
 
     /**
+     * @var Unit The day temperature. Might not be null.
+     */
+    public $day;
+    
+    /**
+     * @var Unit The morning temperature. Might not be null.
+     */
+    public $morning;
+    
+    /**
+     * @var Unit The evening temperature. Might not be null.
+     */
+    public $evening;
+    
+    /**
+     * @var Unit The night temperature. Might not be null.
+     */
+    public $night;
+
+    /**
      * Returns the current temperature as formatted string.
      *
      * @return string The current temperature as a formatted string.
@@ -93,13 +113,21 @@ class Temperature
      * @param Unit $now The current temperature.
      * @param Unit $min The minimal temperature.
      * @param Unit $max The maximal temperature.
+     * @param Unit $day The day temperature. Might not be null.
+     * @param Unit $morning The morning temperature. Might not be null.
+     * @param Unit $evening The evening temperature. Might not be null.
+     * @param Unit $night The night temperature. Might not be null.
      *
      * @internal
      */
-    public function __construct(Unit $now, Unit $min, Unit $max)
+    public function __construct(Unit $now, Unit $min, Unit $max, Unit $day = null, Unit $morning = null, Unit $evening = null, Unit $night = null)
     {
         $this->now = $now;
         $this->min = $min;
         $this->max = $max;
+        $this->day = $day;
+        $this->morning = $morning;
+        $this->evening = $evening;
+        $this->night = $night;
     }
 }

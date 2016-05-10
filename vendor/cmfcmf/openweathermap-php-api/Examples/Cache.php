@@ -18,14 +18,7 @@
 use Cmfcmf\OpenWeatherMap;
 use Cmfcmf\OpenWeatherMap\AbstractCache;
 
-if (file_exists('../vendor/autoload.php')) {
-    // Library is not part of a project. "composer install" was executed directly on this library's composer file.
-    require('../vendor/autoload.php');
-} else {
-    // Library is part of a project.
-    /** @noinspection PhpIncludeInspection */
-    require('../../../autoload.php');
-}
+require_once __DIR__ . '/bootstrap.php';
 
 /**
  * Example cache implementation.
@@ -88,7 +81,7 @@ $lang = 'de';
 $units = 'metric';
 
 // Example 1: Use your own cache implementation. Cache for 10 seconds only in this example.
-$owm = new OpenWeatherMap(null, new ExampleCache(), 10);
+$owm = new OpenWeatherMap($myApiKey, null, new ExampleCache(), 10);
 
 $weather = $owm->getWeather('Berlin', $units, $lang);
 echo "EXAMPLE 1<hr />\n\n\n";
