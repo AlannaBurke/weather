@@ -77,13 +77,13 @@ function weather_get_forecasts_from_database($geoid, $utc_offset, $days, $detail
   else {
     if ($days > 1) {
       $forecasts = db_query(
-        'SELECT * FROM {weather_forecasts} WHERE geoid = :geoid AND time_from >= :tomorrow_local_time AND period = 2 AND time_from <= :forecasts_until_local_time ORDER BY time_from ASC',
+        'SELECT * FROM {weather_forecasts} WHERE geoid = :geoid AND time_from >= :tomorrow_local_time AND period = \'2\' AND time_from <= :forecasts_until_local_time ORDER BY time_from ASC',
         array(':geoid' => $geoid, ':tomorrow_local_time' => $tomorrow_local_time, 'forecasts_until_local_time' => $forecasts_until_local_time));
       $weather = array_merge($weather, _weather_create_weather_array($forecasts));
     }
     elseif ($days == 0) {
       $forecasts = db_query(
-        'SELECT * FROM {weather_forecasts} WHERE geoid = :geoid AND time_from >= :tomorrow_local_time AND period = 2 ORDER BY time_from ASC',
+        'SELECT * FROM {weather_forecasts} WHERE geoid = :geoid AND time_from >= :tomorrow_local_time AND period = \'2\' ORDER BY time_from ASC',
         array(':geoid' => $geoid, ':tomorrow_local_time' => $tomorrow_local_time));
       $weather = array_merge($weather, _weather_create_weather_array($forecasts));
     }
@@ -204,11 +204,11 @@ function _weather_parse_forecast($xml, $geoid = '') {
   $utctime = strtotime((string) $fc->meta->nextupdate . ' UTC') - 60 * $meta['utc_offset'];
   $meta['next_update'] = gmdate('Y-m-d H:i:s', $utctime);
   $meta['next_download_attempt'] = $meta['next_update'];
-  // Remove meta information for this location.
-  db_delete('weather_forecast_information')
-    ->condition('geoid', $meta['geoid'])
-    ->execute();
-  db_insert('weather_forecast_information')
+  // Merge meta information for this location.
+  // This prevents an integrity constraint violation, if multiple
+  // calls to this function occur at the same time. See bug #1412352
+  db_merge('weather_forecast_information')
+    ->key(array('geoid' => $meta['geoid']))
     ->fields($meta)
     ->execute();
   // Remove all forecasts for this location.
@@ -234,7 +234,9 @@ function _weather_parse_forecast($xml, $geoid = '') {
     $forecast['wind_speed'] = (float) $time->windSpeed['mps'];
     $forecast['temperature'] = (int) $time->temperature['value'];
     $forecast['pressure'] = (int) $time->pressure['value'];
-    db_insert('weather_forecasts')
+    // Use db_merge to prevent integrity constraint violation, see above.
+    db_merge('weather_forecasts')
+      ->key(array('geoid' => $meta['geoid'], 'time_from' => $forecast['time_from']))
       ->fields($forecast)
       ->execute();
   }

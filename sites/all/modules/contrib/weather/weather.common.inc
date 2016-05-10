@@ -232,6 +232,10 @@ function _weather_get_link_for_geoid($geoid, $destination, $number=1) {
       $link = 'weather/' . $link . '/u';
       break;
     case 'yr':
+      // Encode special characters except the '/' in the URL.
+      // Otherwise, the request will fail on yr.no.
+      $link = rawurlencode($link);
+      $link = str_replace('%2F', '/', $link);
       $link = 'http://www.yr.no/place/' . $link . '/forecast.xml';
       break;
     case 'yr.no':

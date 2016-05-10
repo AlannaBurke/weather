@@ -671,17 +671,21 @@ function weather_update_7208(&$sandbox) {
  * Add 'status' column to table {weather_places} to support custom locations.
  */
 function weather_update_7209(&$sandbox) {
-  // Delete all entries from the table, if any.
-  db_delete('weather_places')->execute();
-  // Add the new column.
-  $spec = array(
-    'description' => 'Status of place',
-    'type' => 'varchar',
-    'length' => 8,
-    'not null' => TRUE,
-    'default' => ''
-  );
-  db_add_field('weather_places', 'status', $spec);
-  // Reload data.
-  _weather_data_installation();
+  // Do not apply this update if the field has been added already.
+  // See #2542966 for more information.
+  if (!db_field_exists('weather_places', 'status')) {
+    // Delete all entries from the table, if any.
+    db_delete('weather_places')->execute();
+    // Add the new column.
+    $spec = array(
+      'description' => 'Status of place',
+      'type' => 'varchar',
+      'length' => 8,
+      'not null' => TRUE,
+      'default' => ''
+    );
+    db_add_field('weather_places', 'status', $spec);
+    // Reload data.
+    _weather_data_installation();
+  }
 }

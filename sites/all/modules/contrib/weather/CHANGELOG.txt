@@ -1,3 +1,31 @@
+Version: 7.x-2.14                                    Date: 2015-12-11
+---------------------------------------------------------------------
+
+* Proper fix for broken update path. Thanks to cstoner for the
+  follow up. Closes: [#2542966]
+
+
+Version: 7.x-2.13                                    Date: 2015-12-08
+---------------------------------------------------------------------
+
+* Remove double addition of database field resulting in a broken
+  update path. Thanks to iowatiger08 and cstoner for the bug report.
+  Closes: [#2542966]
+
+
+Version: 7.x-2.12                                    Date: 2015-08-26
+---------------------------------------------------------------------
+
+* Correct download link on yr.no for places with special (non-ASCII)
+  characters in the URL. Thanks to 1mundus for the bug report.
+  Closes: [#2505035]
+* Fix integrity constraint violation for downloaded weather
+  forecasts. Thanks to Reis Quarteu for the bug report and
+  kevinn for the patch. Closes: [#1412352]
+* Fix string vs. integer comparision on PostgreSQL. Thanks to
+  JimmyAx for the bug report and patch. Closes: [#2542408]
+
+
 Version: 7.x-2.11                                    Date: 2015-05-06
 ---------------------------------------------------------------------
 
