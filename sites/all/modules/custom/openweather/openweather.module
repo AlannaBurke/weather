@@ -5,16 +5,20 @@
  */
 
 require_once DRUPAL_ROOT . '/vendor/cmfcmf/openweathermap-php-api/Cmfcmf/OpenWeatherMap.php';
+
 // Must point to composer's autoload file.
 require DRUPAL_ROOT . '/vendor/autoload.php';
+
 use Cmfcmf\OpenWeatherMap;
 
+putenv("TZ=America/Tijuana");
 /**
  * Function to get hourly weather history (test).
  */
 function openweather_get_history() {
+  $api_key = '049196ba91a7e3e772c2c420d69cb682';
+
   global $_SESSION;
-  //dpm($_SESSION);
   // Language of data (try your own language here!):
   $lang = 'en';
 
@@ -22,14 +26,25 @@ function openweather_get_history() {
   $units = 'imperial';
 
   // Get OpenWeatherMap object.
-  $owm = new OpenWeatherMap();
+  $owm = new OpenWeatherMap($api_key);
+
+  $history = $owm->getWeatherHistory('Oceanside', new \DateTime('- 1 week'), new \DateTime('now'), 'hour', $units, $lang);
+
+  foreach ($history as $weather) {
+    $humidity['value'][]  = $weather->humidity->getValue();
+    $humidity['time'][] = $weather->time->format("D M j Y g:i a");
+    $pressure['value'][]  = $weather->pressure->getValue() * 0.0295301;
+    $pressure['time'][] = $weather->time->format("D M j Y g:i a");
+  }
+
+  openweather_pressure_line_graph($pressure);
+  openweather_humidity_line_graph($humidity);
 
   $weather = $owm->getWeather('Oceanside', $units, $lang);
-  //dpm($weather);
-      $history_markup = t('%time' . '<br />', array('%time' => date("D M j Y g:i a")));
-    $history_markup .= 'Temp: ' . $weather->temperature->getFormatted() . '<br />';
-    $history_markup .= 'Pressure: ' . $weather->pressure . '<br />';
-    $history_markup .= 'Humidity: ' . $weather->humidity . '<br /><br />';
+  $history_markup = t('%time' . '<br />', array('%time' => date("D M j Y g:i a")));
+  $history_markup .= 'Temp: ' . $weather->temperature->getFormatted() . '<br />';
+  $history_markup .= 'Pressure: ' . $weather->pressure->getValue() * 0.0295301 . '<br />';
+  $history_markup .= 'Humidity: ' . $weather->humidity . '<br /><br />';
   return $history_markup;
 }
 
@@ -51,4 +66,104 @@ function openweather_block_view() {
   $block['subject'] = t('Weather History');
   $block['content'] = openweather_get_history();
   return $block;
+}
+
+
+function openweather_humidity_line_graph(array $array) {
+  require_once libraries_get_path('jpgraph') . '/src/jpgraph.php';
+  require_once libraries_get_path('jpgraph') . '/src/jpgraph_line.php';
+  require_once libraries_get_path('jpgraph') . '/src/jpgraph_bar.php';
+
+  $datay = $array['value'];
+  $datax = $array['time'];
+
+  // New graph with a background image and drop shadow
+  $graph = new Graph(800,800);
+  $graph->SetShadow();
+
+  // Use an integer X-scale
+  $graph->SetScale("textlin");
+
+  // Set title and subtitle
+  $graph->title->Set("Humidity over Time");
+  $graph->subtitle->Set("Oceanside " . date("D M j Y g:i a"));
+
+  // Use built in font
+  $graph->title->SetFont(FF_FONT1,FS_BOLD);
+
+  // Make the margin around the plot a little bit bigger
+  // then default
+  $graph->img->SetMargin(40,140,40,100);
+
+  // Slightly adjust the legend from it's default position in the
+  // top right corner to middle right side
+  $graph->legend->Pos(0.05,0.5,"right","center");
+
+  // Display every 10:th datalabel
+  $graph->xaxis->SetTextTickInterval(2);
+  $graph->xaxis->SetTextLabelInterval(1);
+  $graph->xaxis->SetTickLabels($datax);
+  $graph->xaxis->SetLabelAngle(90);
+
+  // Create a red line plot
+  $p1 = new LinePlot($datay);
+  $p1->SetColor("red");
+  $p1->SetLegend("Humidity");
+
+
+  // The order the plots are added determines who's ontop
+  $graph->Add($p1);
+
+  // Finally output the  image
+  $graph->Stroke(DRUPAL_ROOT . '/sites/all/modules/custom/openweather/images/humidity' . date("D M j Y g:i a") . '.png');
+
+}
+
+function openweather_pressure_line_graph(array $array) {
+  require_once libraries_get_path('jpgraph') . '/src/jpgraph.php';
+  require_once libraries_get_path('jpgraph') . '/src/jpgraph_line.php';
+  require_once libraries_get_path('jpgraph') . '/src/jpgraph_bar.php';
+
+  $datay = $array['value'];
+  $datax = $array['time'];
+
+  // New graph with a background image and drop shadow
+  $graph = new Graph(1200,1000);
+  $graph->SetShadow();
+
+  // Use an integer X-scale
+  $graph->SetScale("textlin");
+
+  // Set title and subtitle
+  $graph->title->Set("Pressure over Time");
+  $graph->subtitle->Set("Oceanside " . date("D M j Y g:i a"));
+
+  // Use built in font
+  $graph->title->SetFont(FF_FONT1,FS_BOLD);
+
+  // Make the margin around the plot a little bit bigger
+  // then default
+  $graph->img->SetMargin(140,140,140,180);
+
+  // Slightly adjust the legend from its default position in the
+  // top right corner to middle right side
+  $graph->legend->Pos(0.05,0.5,"right","center");
+
+  // Display every 10:th datalabel
+  $graph->xaxis->SetTextTickInterval(1);
+  $graph->xaxis->SetTextLabelInterval(2);
+  $graph->xaxis->SetTickLabels($datax);
+  $graph->xaxis->SetLabelAngle(90);
+
+  // Create a red line plot
+  $p1 = new LinePlot($datay);
+  $p1->SetColor("red");
+  $p1->SetLegend("Pressure");
+
+  // The order the plots are added determines who's on top
+  $graph->Add($p1);
+
+  // Finally output the  image
+  $graph->Stroke(DRUPAL_ROOT . '/sites/all/modules/custom/openweather/images/pressure' . date("D M j Y g:i a") . '.png');
+
 }
